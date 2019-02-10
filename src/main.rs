@@ -4,7 +4,7 @@
 
 use std::{io, fs, num};
 
-use patch_rs::{PatchError, PatchProcessor};
+use patch_rs::{Patch, PatchError, PatchProcessor};
 
 use combinediff_rs::*;
 
@@ -12,8 +12,14 @@ use combinediff_rs::*;
 enum Error {
     Reading(io::Error),
     ContextRadius(num::ParseIntError),
+    BothEmpty,
     Patch(PatchError),
 }
+
+#[cfg(target_os = "windows")]
+const EMPTY_PATCH: &str = "nul";
+#[cfg(target_os = "linux")]
+const EMPTY_PATCH: &str = "/dev/null";
 
 type CombinediffResult = Result<(), Error>;
 
@@ -56,13 +62,25 @@ fn main() -> CombinediffResult {
     let patch_2 = args.value_of("patch_2").expect("Unreachable");
     let context_radius = args.value_of("context_radius").expect("Unreachable");
 
-    let patch_1 = fs::read_to_string(patch_1).map_err(Error::Reading)?;
-    let patch_1 = PatchProcessor::convert(&patch_1).map_err(Error::Patch)?;
-
-    let patch_2 = fs::read_to_string(patch_2).map_err(Error::Reading)?;
-    let patch_2 = PatchProcessor::convert(&patch_2).map_err(Error::Patch)?;
-
     let context_radius: usize = context_radius.parse().map_err(Error::ContextRadius)?;
+
+    if patch_1 == EMPTY_PATCH && patch_2 == EMPTY_PATCH {
+        return Err(Error::BothEmpty);
+    }
+
+    let patch_1 = if patch_1 != EMPTY_PATCH {
+        let patch_1 = fs::read_to_string(patch_1).map_err(Error::Reading)?;
+        PatchProcessor::convert(&patch_1).map_err(Error::Patch)?
+    } else {
+        Patch::default()
+    };
+
+    let patch_2 = if patch_2 != EMPTY_PATCH {
+        let patch_2 = fs::read_to_string(patch_2).map_err(Error::Reading)?;
+        PatchProcessor::convert(&patch_2).map_err(Error::Patch)?
+    } else {
+        Patch::default()
+    };
 
     println!("{}", combinediff(patch_1, patch_2, context_radius));
 
