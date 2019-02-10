@@ -22,13 +22,13 @@ pub fn combinediff(mut patch_1: Patch, mut patch_2: Patch, context_radius: usize
         if p1.header.file1_l <= p2.header.file1_l {
             let context = patch_1.contexts.pop_front().unwrap();
             let reduced = context.reduce(context_radius);
-            for mut context in reduced.into_iter() {
+            for context in reduced.into_iter() {
                 combinediff.contexts.push_back(context);
             }
         } else {
             let context = patch_2.contexts.pop_front().unwrap();
             let reduced = context.reduce(context_radius);
-            for mut context in reduced.into_iter() {
+            for context in reduced.into_iter() {
                 combinediff.contexts.push_back(context);
             }
         }
@@ -37,7 +37,7 @@ pub fn combinediff(mut patch_1: Patch, mut patch_2: Patch, context_radius: usize
     while !patch_1.contexts.is_empty() {
         let context = patch_1.contexts.pop_front().unwrap();
         let reduced = context.reduce(context_radius);
-        for mut context in reduced.into_iter() {
+        for context in reduced.into_iter() {
             combinediff.contexts.push_back(context);
         }
     }
@@ -45,7 +45,7 @@ pub fn combinediff(mut patch_1: Patch, mut patch_2: Patch, context_radius: usize
     while !patch_2.contexts.is_empty() {
         let context = patch_2.contexts.pop_front().unwrap();
         let reduced = context.reduce(context_radius);
-        for mut context in reduced.into_iter() {
+        for context in reduced.into_iter() {
             combinediff.contexts.push_back(context);
         }
     }
