@@ -1,0 +1,14 @@
+[package]
+name = "combinediff-rs"
+version = "0.1.0"
+authors = ["hedgar2017 <hedgar2017@gmail.com>"]
+license = "MIT"
+description = "Rust combinediff implementation"
+edition = "2018"
+
+[dependencies]
+env_logger = "0.6.0"
+log = "0.4.6"
+clap = "2.32"
+
+patch-rs = "0.6.2"
